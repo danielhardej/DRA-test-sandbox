@@ -42,6 +42,17 @@ A comprehensive test workflow that includes multiple jobs testing:
 - Combined checks with multiple configurations
 - Action vulnerability scanning
 
+### 6. Dependency Review - Advanced Configuration
+**File**: `.github/workflows/dependency-review-advanced.yml`
+
+Tests advanced and edge-case configurations:
+- Critical-only vulnerability scanning
+- Dependency scope filtering (runtime, development, etc.)
+- External configuration file usage
+- Custom base/head ref comparisons
+- Strict security combined with license checks
+- Package exclusions
+
 ## Test Dependencies
 
 The repository includes sample dependency files for testing:
@@ -51,6 +62,11 @@ The repository includes sample dependency files for testing:
 - **go.mod**: Go dependencies
 
 These files contain various packages with different licenses and potential vulnerabilities to trigger the Dependency Review Action.
+
+## Configuration Files
+
+- **.github/dependency-review-config.yml**: Sample external configuration file that can be referenced in workflows for centralized configuration management
+- **.gitignore**: Prevents build artifacts and dependencies from being committed
 
 ## Usage
 
@@ -67,9 +83,15 @@ The workflows test the following Dependency Review Action configuration options:
 - `fail-on-severity`: Set vulnerability severity threshold (low, moderate, high, critical)
 - `allow-licenses`: Specify allowed licenses (mutually exclusive with deny-licenses)
 - `deny-licenses`: Specify denied licenses (mutually exclusive with allow-licenses)
-- `comment-summary-in-pr`: Post review summaries as PR comments
+- `comment-summary-in-pr`: Post review summaries as PR comments (always, never, on-failure)
 - `vulnerability-check`: Enable/disable vulnerability checking
+- `license-check`: Enable/disable license checking
 - `deny-ghsas`: Deny specific GitHub Security Advisories
+- `fail-on-scopes`: Only fail on dependencies in specific scopes (runtime, development, unknown)
+- `config-file`: Use an external configuration file
+- `base-ref` / `head-ref`: Custom git references for comparison
+- `deny-packages`: Exclude specific packages from review
+- `retry-on-snapshot-warnings`: Retry if snapshot warnings occur
 
 ## Notes
 

@@ -1,0 +1,30 @@
+# Dependency Review Action Configuration File
+# This file can be referenced in workflows using the config-file parameter
+
+# Fail on vulnerabilities of this severity or higher
+fail_on_severity: 'moderate'
+
+# Allow only these licenses
+allow_licenses:
+  - 'MIT'
+  - 'Apache-2.0'
+  - 'BSD-2-Clause'
+  - 'BSD-3-Clause'
+  - 'ISC'
+  - '0BSD'
+
+# Fail on these specific GitHub Security Advisories
+deny_ghsas:
+  - 'GHSA-example-1234-5678'
+
+# Only fail on dependencies in these scopes
+fail_on_scopes:
+  - 'runtime'
+  - 'unknown'
+
+# Enable/disable specific checks
+vulnerability_check: true
+license_check: true
+
+# Comment behavior
+comment_summary_in_pr: 'always'
