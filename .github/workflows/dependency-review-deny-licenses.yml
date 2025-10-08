@@ -1,4 +1,4 @@
-name: 'Dependency Review - Deny Licenses'
+name: 'Test Deny Licenses with Exceptions'
 
 on:
   pull_request:
@@ -19,5 +19,7 @@ jobs:
         uses: actions/dependency-review-action@v4
         with:
           # Deny GPL licenses and other copyleft licenses
-          deny-licenses: GPL-2.0, GPL-3.0, LGPL-2.0, LGPL-2.1, LGPL-3.0, AGPL-3.0
+          deny-licenses: GPL-2.0, GPL-3.0, LGPL-2.0, LGPL-2.1, LGPL-3.0, AGPL-3.0, MPL-2.0, MS-PL, MIT
           comment-summary-in-pr: always
+          # But allow specific packages with GPL licenses
+          allow-dependencies-licenses: 'pkg:npm/readline-sync, pkg:pypi/gplearn, pkg:npm/@netdata/charts'
