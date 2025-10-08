@@ -95,6 +95,7 @@ The workflows test the following Dependency Review Action configuration options:
 - `fail-on-severity`: Set vulnerability severity threshold (low, moderate, high, critical)
 - `allow-licenses`: Specify allowed licenses (mutually exclusive with deny-licenses)
 - `deny-licenses`: Specify denied licenses (mutually exclusive with allow-licenses)
+- `allow-dependencies-licenses`: Exempt specific packages from license checks (overrides allow-licenses/deny-licenses for listed packages)
 - `comment-summary-in-pr`: Post review summaries as PR comments (always, never, on-failure)
 - `vulnerability-check`: Enable/disable vulnerability checking
 - `license-check`: Enable/disable license checking

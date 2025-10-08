@@ -169,6 +169,76 @@ numpy==1.24.0
 - `numpy` - BSD license
 - All should pass license checks
 
+#### Example 4: Testing allow-dependencies-licenses with deny-licenses (Exception Override)
+
+The `allow-dependencies-licenses` option allows you to exempt specific packages from license checks, even when they have licenses that would normally be denied. This is useful when you need to make an exception for a particular dependency.
+
+**Scenario:** You want to deny GPL licenses globally, but you need to allow a specific package that has a GPL license.
+
+Create a custom workflow file `.github/workflows/test-license-exception.yml`:
+
+```yaml
+name: 'Test License Exception'
+
+on:
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  test-license-exception:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout Repository'
+        uses: actions/checkout@v4
+        
+      - name: 'Dependency Review with License Exception'
+        uses: actions/dependency-review-action@v4
+        with:
+          # Deny GPL licenses globally
+          deny-licenses: GPL-2.0, GPL-3.0, LGPL-2.0, LGPL-3.0
+          # But allow specific packages with GPL licenses
+          allow-dependencies-licenses: 'pkg:npm/readline-sync, pkg:pypi/gplearn'
+          comment-summary-in-pr: always
+```
+
+Then add GPL-licensed packages to your `package.json`:
+
+```json
+{
+  "name": "dra-test-sandbox",
+  "version": "1.0.0",
+  "dependencies": {
+    "express": "^4.18.0",
+    "readline-sync": "^1.4.10"
+  }
+}
+```
+
+**What this tests:**
+- `readline-sync` has a GPL-3.0 license, which is in the `deny-licenses` list
+- However, `pkg:npm/readline-sync` is listed in `allow-dependencies-licenses`
+- **Expected result:** The workflow should **PASS** because the specific package exemption overrides the global deny-licenses rule
+- This demonstrates that `allow-dependencies-licenses` acts as an override for specific packages
+
+**Comparison - Without the exception:**
+
+If you remove `readline-sync` from the `allow-dependencies-licenses` list:
+
+```yaml
+with:
+  deny-licenses: GPL-2.0, GPL-3.0, LGPL-2.0, LGPL-3.0
+  # No allow-dependencies-licenses specified
+  comment-summary-in-pr: always
+```
+
+**Expected result:** The workflow will **FAIL** because `readline-sync` has a GPL-3.0 license which is denied.
+
+**Key takeaway:** `allow-dependencies-licenses` provides fine-grained control, allowing you to create exceptions for specific packages even when they have globally denied licenses. This is useful for legacy dependencies or required packages where you've accepted the license risk.
+
 ### Testing Action Vulnerability Scanning
 
 The workflows in this repository use various GitHub Actions from the marketplace. When you:
@@ -337,6 +407,63 @@ require (
 ```
 
 **Expected result:** All workflows should pass with green checks.
+
+### Scenario 6: Test License Exception Override (allow-dependencies-licenses with deny-licenses)
+
+**Goal:** Demonstrate that `allow-dependencies-licenses` can override `deny-licenses` for specific packages
+
+**Create a new workflow file:** `.github/workflows/test-license-exception.yml`
+
+```yaml
+name: 'Test License Exception Override'
+
+on:
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  test-license-exception:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout Repository'
+        uses: actions/checkout@v4
+        
+      - name: 'Dependency Review with License Exception'
+        uses: actions/dependency-review-action@v4
+        with:
+          deny-licenses: GPL-2.0, GPL-3.0, LGPL-2.0, LGPL-3.0
+          allow-dependencies-licenses: 'pkg:npm/readline-sync'
+          comment-summary-in-pr: always
+```
+
+**File to modify:** `package.json`
+
+```json
+{
+  "name": "dra-test-sandbox",
+  "version": "1.0.0",
+  "dependencies": {
+    "express": "^4.18.0",
+    "readline-sync": "^1.4.10"
+  }
+}
+```
+
+**Expected result:** 
+- The workflow will **PASS** even though `readline-sync` has a GPL-3.0 license (which is in the deny-licenses list)
+- This is because `pkg:npm/readline-sync` is explicitly listed in `allow-dependencies-licenses`
+- The `allow-dependencies-licenses` acts as an exception/override for that specific package
+
+**To compare:** Remove `readline-sync` from the `allow-dependencies-licenses` parameter and the workflow will **FAIL** with a license violation error.
+
+**What this demonstrates:**
+- Fine-grained license control for specific packages
+- Ability to make exceptions for required dependencies with otherwise denied licenses
+- Priority: `allow-dependencies-licenses` overrides global `deny-licenses` rules for specified packages
 
 ## Manual Testing Workflow
 
