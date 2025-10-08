@@ -89,8 +89,9 @@ Different workflows test different severity thresholds:
 
 2. **Modify a dependency file**:
    ```bash
-   # Add a vulnerable package to package.json
-   echo 'Add your changes here'
+   # Example: Add a vulnerable version of lodash to package.json
+   # Edit package.json manually or use jq:
+   jq '.dependencies.lodash = "4.17.10"' package.json > tmp.json && mv tmp.json package.json
    ```
 
 3. **Commit and push**:

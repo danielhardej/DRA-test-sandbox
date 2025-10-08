@@ -15,10 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     name: 'Test Various Action Version Formats'
     steps:
-      - name: 'Checkout - Full SHA'
-        uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
-        
-      - name: 'Checkout - Tag Version'
+      - name: 'Checkout Repository'
         uses: actions/checkout@v4
         
       - name: 'Setup Node - Pinned Version'
@@ -48,7 +45,13 @@ jobs:
         with:
           name: test-file
           path: README.md
-      
+  
+  # Test artifact download in a separate job
+  test-artifact-download:
+    runs-on: ubuntu-latest
+    name: 'Test Artifact Download'
+    needs: test-action-versions
+    steps:
       - name: 'Download Artifact'
         uses: actions/download-artifact@v4
         with:
