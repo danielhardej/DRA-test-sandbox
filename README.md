@@ -53,6 +53,16 @@ Tests advanced and edge-case configurations:
 - Strict security combined with license checks
 - Package exclusions
 
+### 7. Test - Action Dependencies with Different Versions
+**File**: `.github/workflows/test-action-versions.yml`
+
+Tests how the Dependency Review Action handles different action version formats:
+- Full SHA references
+- Tag-based versions (v4, v5, etc.)
+- Pinned versions (v4.0.2)
+- Third-party marketplace actions
+- Demonstrates action vulnerability scanning across different version formats
+
 ## Test Dependencies
 
 The repository includes sample dependency files for testing:
@@ -75,6 +85,8 @@ To test the Dependency Review Action:
 1. Create a pull request with changes to any of the dependency files
 2. The workflows will automatically run and report findings
 3. Check the PR comments for detailed reports from the Dependency Review Action
+
+For detailed testing instructions, see [TESTING_GUIDE.md](TESTING_GUIDE.md).
 
 ## Configuration Options Tested
 

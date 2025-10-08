@@ -1,0 +1,89 @@
+name: 'Test - Action Dependencies with Different Versions'
+
+on:
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  # Use actions with different version formats
+  test-action-versions:
+    runs-on: ubuntu-latest
+    name: 'Test Various Action Version Formats'
+    steps:
+      - name: 'Checkout - Full SHA'
+        uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
+        
+      - name: 'Checkout - Tag Version'
+        uses: actions/checkout@v4
+        
+      - name: 'Setup Node - Pinned Version'
+        uses: actions/setup-node@v4.0.2
+        with:
+          node-version: '20'
+      
+      - name: 'Setup Python - Major Version'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: 'GitHub Script Action'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            console.log('Testing GitHub Script Action')
+      
+      - name: 'Cache Action'
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache
+          key: test-key-${{ runner.os }}
+      
+      - name: 'Upload Artifact'
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-file
+          path: README.md
+      
+      - name: 'Download Artifact'
+        uses: actions/download-artifact@v4
+        with:
+          name: test-file
+  
+  # Test with third-party actions
+  test-third-party-actions:
+    runs-on: ubuntu-latest
+    name: 'Test Third-Party Actions'
+    steps:
+      - name: 'Checkout'
+        uses: actions/checkout@v4
+      
+      - name: 'Super Linter'
+        uses: github/super-linter@v5
+        env:
+          DEFAULT_BRANCH: main
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VALIDATE_ALL_CODEBASE: false
+        continue-on-error: true
+      
+      - name: 'Markdown Link Check'
+        uses: gaurav-nelson/github-action-markdown-link-check@v1
+        continue-on-error: true
+  
+  # Run dependency review on this workflow
+  review-action-dependencies:
+    runs-on: ubuntu-latest
+    name: 'Review Action Dependencies'
+    steps:
+      - name: 'Checkout'
+        uses: actions/checkout@v4
+      
+      - name: 'Dependency Review'
+        uses: actions/dependency-review-action@v4
+        with:
+          comment-summary-in-pr: always
+          fail-on-severity: moderate

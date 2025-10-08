@@ -1,0 +1,29 @@
+name: 'Test - Known Vulnerable Dependencies'
+
+on:
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  # This workflow intentionally uses older versions that may have known vulnerabilities
+  # to test the Dependency Review Action's vulnerability detection
+  test-vulnerable-actions:
+    runs-on: ubuntu-latest
+    name: 'Test with Potentially Vulnerable Actions'
+    steps:
+      - name: 'Checkout'
+        uses: actions/checkout@v3  # Older version for testing
+        
+      - name: 'Setup Node - Older Version'
+        uses: actions/setup-node@v3  # Older version for testing
+        with:
+          node-version: '16'
+      
+      - name: 'Note'
+        run: |
+          echo "This workflow uses older action versions to test vulnerability detection"
+          echo "In production, always use the latest stable versions"
