@@ -22,4 +22,4 @@ jobs:
           deny-licenses: GPL-2.0, GPL-3.0, LGPL-2.0, LGPL-2.1, LGPL-3.0, AGPL-3.0, MPL-2.0, MS-PL, MIT
           comment-summary-in-pr: always
           # But allow specific packages with GPL licenses
-          allow-dependencies-licenses: 'pkg:npm/readline-sync, pkg:pypi/gplearn, pkg:npm/@netdata/charts'
+          allow-dependencies-licenses: 'pkg:npm/readline-sync, pkg:pypi/gplearn, pkg:npm/@netdata/charts, pkg:npm/@netdata/netdata-ui'
