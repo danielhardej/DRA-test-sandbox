@@ -14,28 +14,160 @@ This guide explains how to use this repository to test the Dependency Review Act
 
 ### Testing Vulnerability Scanning
 
-To test vulnerability scanning:
+To test vulnerability scanning, you need to add or update packages to versions with known vulnerabilities. Here are specific examples for each dependency file:
 
-1. Add a package with known vulnerabilities to one of the dependency files
-2. For example, add an old version of a package to `package.json`:
-   ```json
-   "lodash": "4.17.10"
-   ```
-3. Create a PR and observe the Dependency Review Action detecting vulnerabilities
+#### Example 1: Testing with package.json (Node.js/npm)
+
+Update your `package.json` to include vulnerable versions:
+
+```json
+{
+  "dependencies": {
+    "lodash": "4.17.10",
+    "minimist": "1.2.5",
+    "axios": "0.21.1",
+    "express": "4.16.0"
+  }
+}
+```
+
+**What this tests:**
+- `lodash 4.17.10` - Has prototype pollution vulnerabilities (CVE-2019-10744, CVE-2020-8203)
+- `minimist 1.2.5` - Has prototype pollution vulnerability (CVE-2021-44906)
+- `axios 0.21.1` - Has SSRF vulnerability (CVE-2021-3749)
+- `express 4.16.0` - Has open redirect vulnerability (CVE-2018-3717)
+
+#### Example 2: Testing with requirements.txt (Python)
+
+Add or update to vulnerable Python package versions:
+
+```
+django==2.2.0
+flask==0.12.2
+requests==2.6.0
+pyyaml==5.3.1
+Pillow==8.1.0
+```
+
+**What this tests:**
+- `django 2.2.0` - Multiple SQL injection and XSS vulnerabilities
+- `flask 0.12.2` - Has denial of service vulnerability
+- `requests 2.6.0` - Multiple security issues in older versions
+- `pyyaml 5.3.1` - Arbitrary code execution vulnerability (CVE-2020-14343)
+- `Pillow 8.1.0` - Multiple image processing vulnerabilities
+
+#### Example 3: Testing with go.mod (Go modules)
+
+Update to older vulnerable versions in `go.mod`:
+
+```go
+module github.com/actions-testing-danielhardej/DRA-test-sandbox
+
+go 1.21
+
+require (
+	github.com/gin-gonic/gin v1.6.0
+	github.com/gorilla/mux v1.7.0
+	golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2
+	gopkg.in/yaml.v2 v2.2.2
+)
+```
+
+**What this tests:**
+- `gin-gonic/gin v1.6.0` - May have older vulnerabilities
+- `gorilla/mux v1.7.0` - Older version that may have security issues
+- `golang.org/x/crypto` (old version) - May have cryptographic vulnerabilities
+- `gopkg.in/yaml.v2 v2.2.2` - Older YAML parser with potential issues
+
+After making these changes, create a PR and observe the Dependency Review Action detecting vulnerabilities
 
 ### Testing License Compliance
 
-To test the allow-licenses feature:
+The Dependency Review Action can detect license violations based on allow-lists and deny-lists. Here are specific examples:
 
-1. Add a package with a license not in the allow-list (e.g., GPL)
-2. The workflow `.github/workflows/dependency-review-allow-licenses.yml` will fail
-3. Check the PR comments for details about the license violation
+#### Example 1: Testing allow-licenses (Packages that should FAIL)
 
-To test the deny-licenses feature:
+Add packages with licenses NOT in the allow-list (MIT, Apache-2.0, BSD, ISC) to `package.json`:
 
-1. Add a package with a denied license (e.g., GPL-3.0)
-2. The workflow `.github/workflows/dependency-review-deny-licenses.yml` will fail
-3. Check the PR comments for details
+```json
+{
+  "dependencies": {
+    "readline-sync": "^1.4.10",
+    "strongloop": "^6.0.5"
+  }
+}
+```
+
+**What this tests:**
+- `readline-sync` - Uses GPL-3.0 license (not in allow-list, will trigger warning)
+- `strongloop` - Uses Artistic-2.0 license (not in allow-list, will trigger warning)
+
+For Python, add packages with non-allowed licenses to `requirements.txt`:
+
+```
+readline==6.2.4.1
+gplearn==0.4.2
+```
+
+**What this tests:**
+- `readline` - GPL license (not allowed)
+- `gplearn` - GPL-3.0 license (not allowed)
+
+#### Example 2: Testing deny-licenses (Packages that should FAIL)
+
+Add packages with GPL or other copyleft licenses to `package.json`:
+
+```json
+{
+  "dependencies": {
+    "node-gpl": "^1.0.0",
+    "gpl3-library": "^1.0.0"
+  }
+}
+```
+
+For Python `requirements.txt`:
+
+```
+pylint==2.0.0
+gpl-package==1.0.0
+```
+
+**What this tests:**
+- Packages with GPL-2.0, GPL-3.0, LGPL, or AGPL licenses
+- The deny-licenses workflow will fail and report these violations
+
+#### Example 3: Testing with safe licenses (Packages that should PASS)
+
+To verify that properly licensed packages pass, use these examples:
+
+In `package.json`:
+```json
+{
+  "dependencies": {
+    "express": "^4.18.0",
+    "react": "^18.2.0",
+    "lodash": "^4.17.21"
+  }
+}
+```
+
+**What this tests:**
+- All have MIT licenses
+- Should pass both allow-licenses and deny-licenses checks
+
+In `requirements.txt`:
+```
+requests==2.31.0
+flask==3.0.0
+numpy==1.24.0
+```
+
+**What this tests:**
+- `requests` - Apache-2.0 license
+- `flask` - BSD license
+- `numpy` - BSD license
+- All should pass license checks
 
 ### Testing Action Vulnerability Scanning
 
@@ -79,6 +211,132 @@ Different workflows test different severity thresholds:
 - All workflows will pass
 - Some workflows may still post comments (depending on `comment-summary-in-pr` setting)
 - The comments will indicate no vulnerabilities or license issues were found
+
+## Complete Testing Examples
+
+Here are complete, copy-paste ready examples for testing different scenarios:
+
+### Scenario 1: Test Vulnerability Detection (High Severity)
+
+**Goal:** Trigger high severity vulnerability warnings
+
+**File to modify:** `package.json`
+
+Replace the entire dependencies section with:
+```json
+{
+  "name": "dra-test-sandbox",
+  "version": "1.0.0",
+  "description": "Test repository for Dependency Review Action",
+  "dependencies": {
+    "lodash": "4.17.10",
+    "minimist": "1.2.5",
+    "axios": "0.21.1"
+  }
+}
+```
+
+**Expected result:** Dependency Review Action will detect multiple high severity vulnerabilities and fail the workflow.
+
+### Scenario 2: Test License Violations (GPL License)
+
+**Goal:** Trigger license violation for GPL-licensed packages
+
+**File to modify:** `package.json`
+
+Add a GPL-licensed package:
+```json
+{
+  "name": "dra-test-sandbox",
+  "version": "1.0.0",
+  "description": "Test repository for Dependency Review Action",
+  "dependencies": {
+    "express": "^4.18.0",
+    "gpl-library": "^1.0.0"
+  }
+}
+```
+
+**Expected result:** The deny-licenses workflow will fail because GPL is in the deny-list.
+
+### Scenario 3: Test Multiple Vulnerabilities Across Ecosystems
+
+**Goal:** Test vulnerability detection in all three dependency files
+
+**Modify all three files:**
+
+`package.json`:
+```json
+{
+  "name": "dra-test-sandbox",
+  "version": "1.0.0",
+  "dependencies": {
+    "lodash": "4.17.10",
+    "express": "4.16.0"
+  }
+}
+```
+
+`requirements.txt`:
+```
+django==2.2.0
+flask==0.12.2
+pyyaml==5.3.1
+```
+
+`go.mod`:
+```go
+module github.com/actions-testing-danielhardej/DRA-test-sandbox
+
+go 1.21
+
+require (
+	github.com/gin-gonic/gin v1.6.0
+	gopkg.in/yaml.v2 v2.2.2
+)
+```
+
+**Expected result:** Dependency Review Action will detect vulnerabilities across all three ecosystems.
+
+### Scenario 4: Test Severity Thresholds
+
+**Goal:** Test that only critical vulnerabilities trigger failures
+
+**File to modify:** `package.json`
+
+```json
+{
+  "name": "dra-test-sandbox",
+  "version": "1.0.0",
+  "dependencies": {
+    "lodash": "4.17.15"
+  }
+}
+```
+
+**Expected result:** 
+- Workflows with `fail-on-severity: low` or `moderate` will fail
+- Workflows with `fail-on-severity: critical` may pass if the vulnerability is not critical
+
+### Scenario 5: Test Clean State (No Issues)
+
+**Goal:** Verify that secure, properly-licensed dependencies pass all checks
+
+**File to modify:** `package.json`
+
+```json
+{
+  "name": "dra-test-sandbox",
+  "version": "1.0.0",
+  "dependencies": {
+    "express": "^4.19.0",
+    "lodash": "^4.17.21",
+    "axios": "^1.6.5"
+  }
+}
+```
+
+**Expected result:** All workflows should pass with green checks.
 
 ## Manual Testing Workflow
 
@@ -132,6 +390,50 @@ Different workflows test different severity thresholds:
 - Verify license information in the package's repository
 
 ## Advanced Testing
+
+### Quick Reference: Known Vulnerable Package Versions
+
+Use these versions to quickly test vulnerability detection:
+
+#### Node.js (package.json)
+| Package | Vulnerable Version | Known Issue |
+|---------|-------------------|-------------|
+| lodash | 4.17.10 | Prototype pollution |
+| minimist | 1.2.5 | Prototype pollution |
+| axios | 0.21.1 | SSRF vulnerability |
+| express | 4.16.0 | Open redirect |
+| ws | 7.4.5 | ReDoS vulnerability |
+| node-fetch | 2.6.6 | Information exposure |
+
+#### Python (requirements.txt)
+| Package | Vulnerable Version | Known Issue |
+|---------|-------------------|-------------|
+| django | 2.2.0 | SQL injection |
+| flask | 0.12.2 | DoS vulnerability |
+| pyyaml | 5.3.1 | Code execution |
+| Pillow | 8.1.0 | Image processing issues |
+| cryptography | 2.2 | Cryptographic issues |
+| urllib3 | 1.24.1 | CRLF injection |
+
+#### Go (go.mod)
+| Package | Vulnerable Version | Known Issue |
+|---------|-------------------|-------------|
+| github.com/gin-gonic/gin | v1.6.0 | Various issues |
+| gopkg.in/yaml.v2 | v2.2.2 | Parsing issues |
+| golang.org/x/crypto | v0.0.0-20190308221718 | Crypto vulnerabilities |
+
+### Quick Reference: License Examples
+
+#### Packages with GPL licenses (will fail deny-licenses check)
+- **npm:** `readline-sync`, `node-gpl`
+- **pip:** `readline`, `gplearn`
+
+#### Packages with permissive licenses (will pass both checks)
+- **npm:** `express` (MIT), `react` (MIT), `axios` (MIT)
+- **pip:** `requests` (Apache-2.0), `flask` (BSD), `numpy` (BSD)
+- **go:** `gin` (MIT), `gorilla/mux` (BSD)
+
+### Advanced Testing
 
 ### Testing External Config File
 
