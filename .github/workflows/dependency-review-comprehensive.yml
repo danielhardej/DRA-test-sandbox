@@ -1,0 +1,102 @@
+name: 'Dependency Review - Comprehensive Test'
+
+on:
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  # Test 1: Basic vulnerability scanning
+  vulnerability-scanning:
+    runs-on: ubuntu-latest
+    name: 'Test Vulnerability Scanning'
+    steps:
+      - name: 'Checkout Repository'
+        uses: actions/checkout@v4
+        
+      - name: 'Dependency Review - Check Vulnerabilities'
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: moderate
+          comment-summary-in-pr: always
+          vulnerability-check: true
+  
+  # Test 2: License allow list
+  license-allow-list:
+    runs-on: ubuntu-latest
+    name: 'Test Allow Licenses'
+    steps:
+      - name: 'Checkout Repository'
+        uses: actions/checkout@v4
+        
+      - name: 'Dependency Review - Allow List'
+        uses: actions/dependency-review-action@v4
+        with:
+          allow-licenses: MIT, Apache-2.0, BSD-2-Clause, BSD-3-Clause, ISC, 0BSD
+          comment-summary-in-pr: always
+  
+  # Test 3: License deny list
+  license-deny-list:
+    runs-on: ubuntu-latest
+    name: 'Test Deny Licenses'
+    steps:
+      - name: 'Checkout Repository'
+        uses: actions/checkout@v4
+        
+      - name: 'Dependency Review - Deny List'
+        uses: actions/dependency-review-action@v4
+        with:
+          deny-licenses: GPL-2.0, GPL-3.0, LGPL-2.0, LGPL-2.1, LGPL-3.0, AGPL-3.0, SSPL-1.0
+          comment-summary-in-pr: always
+  
+  # Test 4: Combined checks with custom severity
+  combined-checks:
+    runs-on: ubuntu-latest
+    name: 'Test Combined Checks'
+    steps:
+      - name: 'Checkout Repository'
+        uses: actions/checkout@v4
+        
+      - name: 'Dependency Review - Combined'
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: high
+          allow-licenses: MIT, Apache-2.0, BSD-2-Clause, BSD-3-Clause, ISC
+          comment-summary-in-pr: always
+          deny-ghsas: GHSA-1234-5678-9012
+  
+  # Test 5: Action vulnerability check
+  action-vulnerability-check:
+    runs-on: ubuntu-latest
+    name: 'Test Action Vulnerability Scanning'
+    steps:
+      - name: 'Checkout Repository'
+        uses: actions/checkout@v4
+      
+      - name: 'Use Multiple Actions for Testing'
+        run: echo "This workflow uses multiple marketplace actions"
+        
+      - name: 'Setup Node'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: 'Setup Python'  
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: 'Cache'
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache
+          key: test-cache-${{ runner.os }}
+      
+      - name: 'Dependency Review for Actions'
+        uses: actions/dependency-review-action@v4
+        with:
+          comment-summary-in-pr: always

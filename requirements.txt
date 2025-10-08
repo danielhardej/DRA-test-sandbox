@@ -1,0 +1,6 @@
+# Python dependencies for testing
+requests==2.31.0
+flask==3.0.0
+numpy==1.24.0
+django==4.2.0
+pyyaml==6.0.1

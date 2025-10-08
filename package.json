@@ -1,0 +1,15 @@
+{
+  "name": "dra-test-sandbox",
+  "version": "1.0.0",
+  "description": "Test repository for Dependency Review Action",
+  "dependencies": {
+    "express": "^4.18.0",
+    "lodash": "^4.17.21",
+    "axios": "^1.6.0",
+    "react": "^18.2.0",
+    "moment": "^2.29.4"
+  },
+  "devDependencies": {
+    "jest": "^29.0.0"
+  }
+}
