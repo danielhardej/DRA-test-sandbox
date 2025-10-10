@@ -19,7 +19,7 @@ jobs:
         uses: actions/dependency-review-action@v4
         with:
           # Deny GPL licenses and other copyleft licenses
-          deny-licenses: GPL-2.0-or-later, GPL-3.0-or-later, LGPL-2.0-or-later, LGPL-2.1-or-later, LGPL-3.0-or-later, AGPL-3.0, MPL-2.0, MS-PL, MIT
+          deny-licenses: GPL-2.0-or-later, GPL-3.0-or-later, LGPL-2.0-or-later, LGPL-2.1-or-later, LGPL-3.0-or-later, AGPL-3.0, MPL-2.0, MS-PL, MIT, OFL-1.1
           comment-summary-in-pr: always
           # But allow specific packages with GPL licenses
-          allow-dependencies-licenses: "pkg:npm/readline-sync, pkg:pypi/gplearn, pkg:npm/@netdata/charts, pkg:npm/@netdata/netdata-ui, pkg:actions/SonarSource/sonarqube-scan-action@v6.0.0"
+          allow-dependencies-licenses: "pkg:npm/@fontsource/noto-sans-phags-pa, pkg:npm/comfy, pkg:npm/@netdata/charts, pkg:npm/@netdata/netdata-ui, pkg:npm/readline-sync, pkg:pypi/gplearn, pkg:actions/SonarSource/sonarqube-scan-action@v6.0.0"
